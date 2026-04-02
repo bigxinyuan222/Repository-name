@@ -1,0 +1,58 @@
+[
+  {
+    "timestamp": "2026-04-02 15:15:05",
+    "data": {
+      "city": "北京",
+      "temperature_c": "18",
+      "temperature_f": "65",
+      "weather_condition": "Sunny",
+      "humidity": "30",
+      "wind_direction": "SSW",
+      "wind_speed_kmph": "7",
+      "update_time": "2026-04-02 15:15:05",
+      "observation_time": "07:03 AM"
+    }
+  },
+  {
+    "timestamp": "2026-04-02 15:15:18",
+    "data": {
+      "city": "北京",
+      "temperature_c": "18",
+      "temperature_f": "65",
+      "weather_condition": "Sunny",
+      "humidity": "30",
+      "wind_direction": "SSW",
+      "wind_speed_kmph": "7",
+      "update_time": "2026-04-02 15:15:18",
+      "observation_time": "07:03 AM"
+    }
+  },
+  {
+    "timestamp": "2026-04-02 15:18:57",
+    "data": {
+      "city": "北京",
+      "temperature_c": "18",
+      "temperature_f": "65",
+      "weather_condition": "Sunny",
+      "humidity": "30",
+      "wind_direction": "SSW",
+      "wind_speed_kmph": "7",
+      "update_time": "2026-04-02 15:18:57",
+      "observation_time": "07:03 AM"
+    }
+  },
+  {
+    "timestamp": "2026-04-02 15:29:00",
+    "data": {
+      "city": "北京",
+      "temperature_c": "18",
+      "temperature_f": "65",
+      "weather_condition": "Sunny",
+      "humidity": "30",
+      "wind_direction": "SSW",
+      "wind_speed_kmph": "7",
+      "update_time": "2026-04-02 15:29:00",
+      "observation_time": "07:03 AM"
+    }
+  }
+]
