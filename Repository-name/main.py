@@ -32,6 +32,7 @@ def fetch_and_save_weather(city, timeout_seconds):
 
 def main():
     """
+    程序的简介
     程序主函数
     加载配置、初始化模块、启动定时任务
     """
