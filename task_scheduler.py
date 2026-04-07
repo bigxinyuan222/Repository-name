@@ -1,9 +1,8 @@
 import time
-from typing import Callable, Dict, Any
-
+from typing import Callable
 from logger_util import get_logger
 
-logger = get_logger()
+logger = get_logger("task_scheduler")
 
 
 class TaskScheduler:
@@ -14,23 +13,21 @@ class TaskScheduler:
     
     def start(self, task: Callable[[], None]) -> None:
         self.running = True
-        logger.info(f"Task scheduler started with interval: {self.interval_minutes} minutes")
+        logger.info(f"定时任务启动，执行间隔: {self.interval_minutes} 分钟")
         
         while self.running:
             try:
                 task()
             except Exception as e:
-                logger.error(f"Task execution failed: {e}")
+                logger.error(f"任务执行出错: {e}")
             
-            if self.running:
-                logger.info(f"Next execution in {self.interval_minutes} minutes...")
-                time.sleep(self.interval_seconds)
+            logger.info(f"等待 {self.interval_minutes} 分钟后执行下一次任务...")
+            time.sleep(self.interval_seconds)
     
     def stop(self) -> None:
         self.running = False
-        logger.info("Task scheduler stopped")
+        logger.info("定时任务已停止")
 
 
-def create_scheduler(config: Dict[str, Any]) -> TaskScheduler:
-    interval = config.get("interval_minutes", 30)
-    return TaskScheduler(interval)
+def create_scheduler(interval_minutes: float) -> TaskScheduler:
+    return TaskScheduler(interval_minutes)

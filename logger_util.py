@@ -17,10 +17,10 @@ def setup_logger(name: str = "weather_app") -> logging.Logger:
     if logger.handlers:
         return logger
     
-    today = datetime.now().strftime("%Y%m%d")
-    log_file = os.path.join(LOG_DIR, f"weather_{today}.log")
+    log_filename = datetime.now().strftime("weather_%Y%m%d.log")
+    log_filepath = os.path.join(LOG_DIR, log_filename)
     
-    file_handler = logging.FileHandler(log_file, encoding="utf-8")
+    file_handler = logging.FileHandler(log_filepath, encoding="utf-8")
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(logging.Formatter(LOG_FORMAT, DATE_FORMAT))
     

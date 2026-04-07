@@ -1,51 +1,51 @@
 import sys
-
-from config_loader import load_config
-from data_saver import save_weather_data
-from logger_util import setup_logger
-from task_scheduler import create_scheduler
+from logger_util import setup_logger, get_logger
+from config_loader import get_config
 from weather_fetcher import fetch_weather_data
+from data_saver import save_weather_data
+from task_scheduler import create_scheduler
+
+logger = get_logger("main")
 
 
-def main():
-    logger = setup_logger()
-    logger.info("=" * 50)
-    logger.info("Weather Fetcher Application Starting...")
-    logger.info("=" * 50)
+def weather_task(city: str, timeout: int) -> None:
+    weather_data = fetch_weather_data(city, timeout)
+    
+    if weather_data:
+        save_weather_data(weather_data)
+        logger.info(f"天气数据获取成功: {weather_data['city']}")
+    else:
+        logger.warning(f"天气数据获取失败: {city}")
+
+
+def main() -> None:
+    setup_logger()
+    logger.info("程序启动")
     
     try:
-        config = load_config()
-    except (FileNotFoundError, ValueError) as e:
-        logger.error(f"Failed to load configuration: {e}")
+        config = get_config()
+    except Exception as e:
+        logger.error(f"配置加载失败: {e}")
         sys.exit(1)
     
     city = config["city"]
+    interval_minutes = config["interval_minutes"]
     timeout = config["timeout_seconds"]
     
-    def weather_task():
-        logger.info(f"Executing weather fetch task for city: {city}")
-        weather_data = fetch_weather_data(city, timeout)
-        
-        if weather_data:
-            success = save_weather_data(weather_data)
-            if success:
-                logger.info("Weather task completed successfully")
-            else:
-                logger.error("Failed to save weather data")
-        else:
-            logger.warning("No weather data fetched, skipping save")
+    logger.info(f"配置信息 - 城市: {city}, 间隔: {interval_minutes} 分钟, 超时: {timeout} 秒")
     
-    scheduler = create_scheduler(config)
+    scheduler = create_scheduler(interval_minutes)
+    
+    def task():
+        weather_task(city, timeout)
     
     try:
-        scheduler.start(weather_task)
+        scheduler.start(task)
     except KeyboardInterrupt:
-        logger.info("Received keyboard interrupt, shutting down...")
+        logger.info("收到中断信号，程序退出")
         scheduler.stop()
-        logger.info("Application stopped gracefully")
     except Exception as e:
-        logger.error(f"Unexpected error: {e}")
-        scheduler.stop()
+        logger.error(f"程序异常退出: {e}")
         sys.exit(1)
 
 
