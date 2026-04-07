@@ -1,50 +1,36 @@
 import time
-import traceback
-from config_loader import load_config
-from weather_fetcher import fetch_weather
-from data_saver import save_weather_data
-from logger_util import setup_logger, log_info, log_error, log_warning
+from typing import Callable, Dict, Any
+
+from logger_util import get_logger
+
+logger = get_logger()
 
 
-def run_task(logger, config):
-    city = config["city"]
-    timeout = config["timeout_seconds"]
+class TaskScheduler:
+    def __init__(self, interval_minutes: float):
+        self.interval_minutes = interval_minutes
+        self.interval_seconds = interval_minutes * 60
+        self.running = False
+    
+    def start(self, task: Callable[[], None]) -> None:
+        self.running = True
+        logger.info(f"Task scheduler started with interval: {self.interval_minutes} minutes")
+        
+        while self.running:
+            try:
+                task()
+            except Exception as e:
+                logger.error(f"Task execution failed: {e}")
+            
+            if self.running:
+                logger.info(f"Next execution in {self.interval_minutes} minutes...")
+                time.sleep(self.interval_seconds)
+    
+    def stop(self) -> None:
+        self.running = False
+        logger.info("Task scheduler stopped")
 
-    try:
-        log_info(logger, f"开始获取 {city} 的天气数据...")
-        weather_data = fetch_weather(city, timeout)
-        log_info(logger, f"成功获取天气数据: {weather_data}")
 
-        filepath = save_weather_data(weather_data)
-        log_info(logger, f"天气数据已保存至: {filepath}")
-        return True
-    except Exception as e:
-        log_error(logger, f"执行任务失败: {str(e)}")
-        log_error(logger, traceback.format_exc())
-        return False
-
-
-def start_scheduler():
-    logger = setup_logger()
-    log_info(logger, "天气获取程序启动")
-
-    try:
-        config = load_config()
-        log_info(logger, f"配置加载成功: {config}")
-    except Exception as e:
-        log_error(logger, f"配置加载失败: {str(e)}")
-        log_error(logger, traceback.format_exc())
-        return
-
-    interval = config["interval_minutes"] * 60
-    log_info(logger, f"定时任务设置为每 {config['interval_minutes']} 分钟执行一次")
-
-    while True:
-        try:
-            run_task(logger, config)
-        except Exception as e:
-            log_error(logger, f"主循环异常: {str(e)}")
-            log_error(logger, traceback.format_exc())
-
-        log_info(logger, f"等待 {config['interval_minutes']} 分钟后执行下一次任务...")
-        time.sleep(interval)
+def create_scheduler(config: Dict[str, Any]) -> TaskScheduler:
+    interval = config.get("interval_minutes", 30)
+    return TaskScheduler(interval)
